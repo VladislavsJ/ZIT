@@ -31,6 +31,7 @@ public class Zit {
 								
 			switch (choiseStr) {
         case "comp":
+          terminationCounter=0;
           System.out.print("source file name: ");
           sourceFile = sc.next();
           System.out.print("archive name: ");
@@ -38,6 +39,7 @@ public class Zit {
           comp(sourceFile, resultFile);
           break;
         case "decomp":
+          terminationCounter=0;
           System.out.print("archive name: ");
           sourceFile = sc.next();
           System.out.print("file name: ");
@@ -45,11 +47,13 @@ public class Zit {
           decomp(sourceFile, resultFile);
           break;
         case "size":
+          terminationCounter=0;
           System.out.print("file name: ");
           sourceFile = sc.next();
           size(sourceFile);
           break;
         case "equal":
+          terminationCounter=0;
           System.out.print("first file name: ");
           firstFile = sc.next();
           System.out.print("second file name: ");
@@ -57,9 +61,12 @@ public class Zit {
           System.out.println(equal(firstFile, secondFile));
           break;
         case "about":
+          terminationCounter=0;
           about();
           break;
         case "exit":
+          break loop;
+        case "q":
           break loop;
         default:
           terminationCounter+=1;
@@ -80,21 +87,27 @@ public class Zit {
 
 
 
-  // TODO:
-  //// make data be passed not as an argument but as a global var
-  //// write shell for freqTable
-  // Check for if the source file exists
+
 
 
 
 
   public static void readFile(String sourceFile){
+    // Check for if the source file exists
+    // open file and fill Data.theData char by char
+
+
     // prototype code
-    System.out.println("reading......");
-    Data.theData.add((byte)0);
+    char[] testData = {'B','A','N','A','N','A'};
+    for(char i : testData){
+      Data.theData.add(i);
+    }
   }
 
   public static void writeFile(String resultFile){
+    // Read from Data.theData and write to resultFile
+
+
     // prototype code
     System.out.println("writing......");
     System.out.println(Data.theData);
@@ -120,6 +133,7 @@ public class Zit {
     writeFile(resultFile);
 	}
 	
+
 
 
 
@@ -185,3 +199,24 @@ public class Zit {
 	}
 }
 
+  // TODO: (for Nikita)
+  //// make data be passed not as an argument but as a global var
+  //// write shell for freqTable
+  //// termcounter bug
+  //// initialize junk data for freq table
+
+  //// make shell for tree maker
+  //// make shell for file to binary
+  //// make shell for window
+
+  //// write comments for every method explaining what exactly to do
+  //// readfile write file
+  //// LZ
+  //// window
+
+  //// implement comp decomp propper file name handle
+  //// convert from byte array to char array
+  //// make window tests prettier
+  // move nodes inside huffman + figure out static methods and nested classes
+  // write tests for all functions (insert Sysout in shells or smtn)
+  // start writing tree maker
