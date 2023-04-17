@@ -25,6 +25,7 @@ public class Huffman {
         // Create an arrayList of leafs which represent table of 
         // frequencies for Huffman coder.
         // dont hesitate to ask questions or make remarks or ask for help
+        
         Leaf leaf = new Leaf();
         for (char c : Data.theData){
             leaf.character == c;
