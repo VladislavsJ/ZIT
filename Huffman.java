@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Huffman {
 
@@ -16,28 +17,19 @@ public class Huffman {
         System.out.println("Decoder empty......");
     }
 
-    public static ArrayList<Leaf> freqTable(){
-        ArrayList<Leaf> leafs = new ArrayList<Leaf>();
-
-        // Data.theData consists of an array of characters.
-        // They represent chars (using ascii table) that are in the file.
-        // So the letter B would be number 66 in Data.theData array.
-        // Create an arrayList of leafs which represent table of 
-        // frequencies for Huffman coder.
-        // dont hesitate to ask questions or make remarks or ask for help
-        
-        Leaf leaf = new Leaf();
-        for (char c : Data.theData){
-            leaf.character == c;
-            leaf.frequency = 1;
-            for(char ch : Data.theData){
-                if (ch = leaf.character) {
-                  leaf.frequency++;
-                }
-            }
-            leafs.add(leaf);
-        }
-        return leafs;
+    public static ArrayList<Leaf> freqTable(){ 
+        ArrayList<Leaf> leafs = new ArrayList<>(); 
+        HashMap<Character, Integer> frequencyMap = new HashMap<>(); 
+        for (char c : Data.theData){ 
+            frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1); 
+        } 
+        for (char c : frequencyMap.keySet()) { 
+            Leaf leaf = new Leaf(); 
+            leaf.character = c; 
+            leaf.frequency = frequencyMap.get(c); 
+            leafs.add(leaf); 
+        } 
+        return leafs; 
     }
 
     public static Node treeMaker(ArrayList<Leaf> leafs){
