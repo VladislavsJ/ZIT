@@ -24,24 +24,18 @@ public class Huffman {
         // So the letter B would be number 66 in Data.theData array.
         // Create an arrayList of leafs which represent table of 
         // frequencies for Huffman coder.
-
         // dont hesitate to ask questions or make remarks or ask for help
-
-
-
-        // prototype code
         Leaf leaf = new Leaf();
-        leaf.character = 'D';
-        leaf.frequency = 3;
-        leafs.add(leaf);
-        leaf.character = 'G';
-        leaf.frequency = 2;
-        leafs.add(leaf);
-        leaf.character = 'R';
-        leaf.frequency = 7;
-        leafs.add(leaf);
-
-        
+        for (char c : Data.theData){
+            leaf.character == c;
+            leaf.frequency = 1;
+            for(char ch : Data.theData){
+                if (ch = leaf.character) {
+                  leaf.frequency++;
+                }
+            }
+            leafs.add(leaf);
+        }
         return leafs;
     }
 
