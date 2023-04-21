@@ -1,11 +1,9 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class Huffman {
     public static void encoder(FileWriter out){
         ArrayList<Leaf> leafs = new ArrayList<Leaf>();
@@ -19,7 +17,7 @@ public class Huffman {
     public static int bitBufferLength=0;
     public static byte bitBuffer1=0;
     public static boolean BufferFileEnd=false;
-    public static int totalChcount=33;//:TODO Insert Count of characters here!!
+    public static int totalChcount=162;//:TODO Insert Count of characters here!!
 
     public static void decoder(FileReader input , ArrayList<Character> theDataHuffman){
         //My idea is that I will insert in the output all chars probabilites
@@ -69,8 +67,11 @@ public class Huffman {
         bitBufferLength=0;
         //
         char c=0;
-        while(!BufferFileEnd && (--totalChcount >0)){
+        int debug=0;
+        while(!BufferFileEnd && (totalChcount-- >0)){
             c=FindCharacterInTree(root, input);
+            //if(debug++>115)
+            //System.out.println("debug");
             System.out.print(c);
             
                 theDataHuffman.add(c);
@@ -171,8 +172,9 @@ public class Huffman {
         // dont forget to insert the tree itself not just the compressed data
 
         // dont hesitate to ask questions or make remarks or ask for help
-        
-        String test = "ZZRRRRRGGGGGOOOOOTTTTTDDDDDDRRRO";
+        bitBuffer1=0;
+        bitBufferLength=0;
+        String test = "OOGGGGGGGOOOOTTTTZZTZTRRRROOOOOGGGGGZZZZTTTTTRRRRRRRROOODDDDDDDDGGGGOOOOOZZZZTTTTOOGGGGGGGOOOOTTTTZZTZTRRRROOOOOGGGGGZZZZTTTTTRRRRRRRROOODDDDDDDDGGGGOOOOOZZZZTTTT";
         try {
         for(int i=0;i<test.length();i++){
             writeBits(FindCharacter(tree, test.charAt(i)),out);  
@@ -184,8 +186,9 @@ public class Huffman {
 
             }
             if (bitBuffer1!=-1){
-                int totalbits = (int)((Math.log(bitBuffer1)+0.5)/(float)Math.log(2));
-                out.write((char)(bitBuffer1<< 8-totalbits));
+                System.out.println(bitBuffer1&0xFF);
+                int totalbits = bitBufferLength;
+                out.write((char)(bitBuffer1<< 8-bitBufferLength));
         }
         out.close();
         } catch (Exception e) {
@@ -274,18 +277,22 @@ public static int BitFromBuffer(FileReader Input) {
         return -1;
     }
 }
+public static int debug=0;
 
 public static void writeBits(int bits,FileWriter out) throws IOException 
 {//there 2 is 1, and 1 is 0;
     // inverse order, Used with FindCharacter which give inversed order
     while(bits>0){
+        //if(debug==44)
+        //System.out.println("debug");
     int lastBit = (bits % 10)-1; // extract the last digit and-1, 2=1, 1=0
     bits /= 10;               // remove the last digit from the number
     bitBuffer1<<=1;
     bitBuffer1|=lastBit;
     if (++bitBufferLength == 8) {  // if the buffer is full write to file
-        out.write((char)bitBuffer1);
-
+        out.write(bitBuffer1);
+        debug++;
+        //ystem.out.println(debug);
         bitBufferLength = 0;  // reset the buffer Lenght
         bitBuffer1=-1;// reset the buffer
         }
