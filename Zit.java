@@ -9,7 +9,10 @@
 // Ņikita Plotņikovs 12. gr. 221RDB021 (Grupas vadītājs)
 
 
+
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -117,17 +120,37 @@ public class Zit {
     readFile(sourceFile);
 
     LZ77.encoder();
-    Huffman.encoder();
-
-    writeFile(resultFile);
+    try {
+        FileWriter writer = new FileWriter("outputH.bin"); // create FileWriter object to write to file
+        //BufferedWriter out = new BufferedWriter(writer);
+        
+    Huffman.encoder(writer);//
+    writer.close();
+    } catch (Exception e) {
+      System.out.println(e);
+      // TODO: handle exception
+    }
+    
+    //writeFile(resultFile);DONE BY Huffman.encoder()
 
     
 	}
 
 	public static void decomp(String sourceFile, String resultFile) {
-    readFile(sourceFile);
-    
-    Huffman.decoder();
+    //readFile(sourceFile);
+    //Test Input
+    try {
+      //FileInputStream input = new FileInputStream("outputH.bin");
+      FileReader reader = new FileReader("outputH.bin");
+      // I made theDataHuffman only to avoid problems, If somebody use Data between Huffman steps
+      
+      Huffman.decoder(reader, Data.theDataHuffman);
+      //input.close();
+      reader.close();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+
     LZ77.decoder();
 
     writeFile(resultFile);
