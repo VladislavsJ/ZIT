@@ -3,14 +3,23 @@ import java.util.HashMap;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Huffman {
+    public static class Node {
+        int frequency;
+    }
+    public static class Branch extends Node{
+        Node left;
+        Node right;
+    }
+    public static class Leaf extends Node{
+        char character;
+    }
+    
+
     public static void encoder(FileWriter out){
-        ArrayList<Leaf> leafs = new ArrayList<Leaf>();
-        leafs = freqTable(); // return leaf table
-        Node tree = treeMaker(leafs);
+        Node tree = treeMaker(freqTable());
         fileToBinary((Branch)tree,out); // return binary file
         
     }
@@ -26,8 +35,10 @@ public class Huffman {
         // and then I will use the probabilites to create a tree, when this code will be maded
         // and then I will use the tree to decode the input
         //test tree
-        ArrayList<Leaf> leaftest = new ArrayList<Leaf>();
-        Leaf leaf = new Leaf(); leaf.character = 'D'; leaf.frequency = 3;
+        ArrayList<Node> leaftest = new ArrayList<Node>();
+        Leaf leaf = new Leaf(); 
+        leaf.character = 'D'; 
+        leaf.frequency = 3;
         leaftest.add(leaf);//0D
         leaf = new Leaf();
         leaf.character = 'G';
@@ -84,8 +95,8 @@ public class Huffman {
         System.out.println("Decoder empty......");
     }
 
-    public static ArrayList<Leaf> freqTable(){ 
-        ArrayList<Leaf> leafs = new ArrayList<>(); 
+    public static ArrayList<Node> freqTable(){ 
+        ArrayList<Node> leafs = new ArrayList<>(); 
         HashMap<Character, Integer> frequencyMap = new HashMap<>(); 
         for (char c : Data.theData){ 
             frequencyMap.put(c, frequencyMap.getOrDefault(c, 0) + 1); 
@@ -99,60 +110,51 @@ public class Huffman {
         return leafs; 
     }
 
-    public static Node treeMaker(ArrayList<Leaf> leafs){
-        // for starters look at pseudo codes on the web to double check the logic
+    public static Node treeMaker(ArrayList<Node> leafs){
+        // making a tree
+        while(leafs.size()!=1){
+            // finding 2 smallest frequency nodes
+            int smallest = Integer.MAX_VALUE;
+            int secondSmallest = Integer.MAX_VALUE;
+            int indexOfSmallest = 0;
+            int indexOfSecondSmallest = 0;
+        
+            for (int i = leafs.size() -1; i >= 0; i--){
+                int current = leafs.get(i).frequency;
+                if (current<smallest){
+                    secondSmallest = smallest;
+                    smallest = current;
+                    indexOfSecondSmallest = indexOfSmallest;
+                    indexOfSmallest = i;
+                } else if (current < secondSmallest){
+                    secondSmallest = current;
+                    indexOfSecondSmallest = i;
+                }
+            }
+            // creating a new branch holding those 2 branches
+            Branch root = new Branch();
+            root.left = leafs.get(indexOfSmallest);
+            root.right = leafs.get(indexOfSecondSmallest);
+            root.frequency = leafs.get(indexOfSmallest).frequency + leafs.get(indexOfSecondSmallest).frequency;
+        
+            //System.out.print(indexOfSmallest+" "+indexOfSecondSmallest+" freq: "+ root.frequency + " size before: "+ leafs.size());
 
-        // pick nodes with the smallest frequency
-        // Create branch to hold them and 
-        // pop them out of an array | mark them as dealt with and dont look at them again
-        // or smth else, but think of another good method
-        // iterate over the array again until u have only one node left
+            // deleting 2 elements in the right order
+            if (indexOfSmallest>indexOfSecondSmallest){
+                leafs.remove(indexOfSmallest);
+                leafs.remove(indexOfSecondSmallest);
+            } else {
+                leafs.remove(indexOfSecondSmallest);
+                leafs.remove(indexOfSmallest);
+            }
 
-
-        // placeholder code
-        ArrayList<Leaf> leafz = new ArrayList<Leaf>();
-        Leaf leaf = new Leaf();
-        leaf.character = 'D';
-        leaf.frequency = 3;
-        leafz.add(leaf);//0D
-        leaf = new Leaf();
-        leaf.character = 'G';
-        leaf.frequency = 2;
-        leafz.add(leaf);//1G
-        leaf = new Leaf();
-        leaf.character = 'R';
-        leaf.frequency = 7;
-        leafz.add(leaf);//2R
-        leaf = new Leaf();
-        leaf.character = 'Z';
-        leaf.frequency = 1;
-        leafz.add(leaf);//3Z
-        leaf = new Leaf();
-        leaf.character = 'T';
-        leaf.frequency = 1;
-        leafz.add(leaf);//4T
-        leaf = new Leaf();
-        leaf.character = 'O';
-        leaf.frequency = 1;
-        leafz.add(leaf);//5O
-
-
-        Branch root = new Branch();
-        Branch ZT= new Branch();
-        ZT.left = leafz.get(3);
-        ZT.right = leafz.get(4);
-        Branch D_Bzt= new Branch();
-        D_Bzt.left= leafz.get(0);
-        D_Bzt.right = ZT;
-        Branch GO = new Branch();
-        GO.left = leafz.get(1);
-        GO.right = leafz.get(5);
-        Branch R_Bgo= new Branch();
-        R_Bgo.left = leafz.get(2);
-        R_Bgo.right = GO;
-        root.left = R_Bgo;
-        root.right = D_Bzt;
-        return root;
+            // adding newly created branch at the end
+            leafs.add(leafs.size(), root);
+        
+            //System.out.print(" new index:"+leafs.size());
+            //System.out.println();
+        }
+        return leafs.get(0);
 
     }
     public static Node fileToBinary(Branch tree,FileWriter out){
@@ -223,75 +225,90 @@ public class Huffman {
                 else return C_Founded*10+1;
         }
     
-}
-public static char FindCharacterInTree(Branch tree,FileReader Input){
-    int bit;
-    while(true){//IF everything is working correctly, this will not loop forever
-        bit = BitFromBuffer(Input);
-        if (bit ==0){
-            if (tree.left instanceof Leaf){
-                return (char)((Leaf) tree.left).character;
+    }
+    public static char FindCharacterInTree(Branch tree,FileReader Input){
+        int bit;
+        while(true){//IF everything is working correctly, this will not loop forever
+            bit = BitFromBuffer(Input);
+            if (bit ==0){
+                if (tree.left instanceof Leaf){
+                    return (char)((Leaf) tree.left).character;
+                }
+                else{
+                    tree = (Branch) tree.left;
+                }
             }
-            else{
-                tree = (Branch) tree.left;
+            else if (bit ==1){
+                if (tree.right instanceof Leaf){
+                    return (char)((Leaf) tree.right).character;
+                }
+                else{
+                    tree = (Branch) tree.right;
+                }
+            }
+            else{//if bit is -1
+                System.out.println("End of the file");
+                return ' ';
             }
         }
-        else if (bit ==1){
-            if (tree.right instanceof Leaf){
-                return (char)((Leaf) tree.right).character;
+
+
+    }
+    public static int BitFromBuffer(FileReader Input) {
+        int bit=0;
+        //read next byte if bitBufferLength ==0,
+        // and get first bit from bitBuffer1
+        // and shift bitBuffer1 to the left
+        //"00011" <<"00110" << "01100" << "11000"
+        try {
+            if(bitBufferLength==0){
+                bitBuffer1=(byte)Input.read();
+                bitBufferLength=8;
             }
-            else{
-                tree = (Branch) tree.right;
-            }
-        }
-        else{//if bit is -1
-            System.out.println("End of the file");
-            return ' ';
+            bitBufferLength--;
+            bit=(bitBuffer1 >> 7) & 1;
+            bitBuffer1<<=1;
+                return bit;
+            
+        } catch (Exception e) {
+            System.out.println(e);
+            BufferFileEnd=true;
+            return -1;
         }
     }
 
-
-}
-public static int BitFromBuffer(FileReader Input) {
-    int bit=0;
-    //read next byte if bitBufferLength ==0,
-    // and get first bit from bitBuffer1
-    // and shift bitBuffer1 to the left
-    //"00011" <<"00110" << "01100" << "11000"
-    try {
-        if(bitBufferLength==0){
-            bitBuffer1=(byte)Input.read();
-            bitBufferLength=8;
-        }
-        bitBufferLength--;
-        bit=(bitBuffer1 >> 7) & 1;
+    public static void writeBits(int bits,FileWriter out) throws IOException 
+    {//there 2 is 1, and 1 is 0;
+        // inverse order, Used with FindCharacter which give inversed order
+        while(bits>0){
+        int lastBit = (bits % 10)-1; // extract the last digit and-1, 2=1, 1=0
+        bits /= 10;               // remove the last digit from the number
         bitBuffer1<<=1;
-            return bit;
-        
-    } catch (Exception e) {
-        System.out.println(e);
-        BufferFileEnd=true;
-        return -1;
-    }
-}
+        bitBuffer1|=lastBit;
+        if (++bitBufferLength == 8) {  // if the buffer is full write to file
+            out.write((char)bitBuffer1);
 
-public static void writeBits(int bits,FileWriter out) throws IOException 
-{//there 2 is 1, and 1 is 0;
-    // inverse order, Used with FindCharacter which give inversed order
-    while(bits>0){
-    int lastBit = (bits % 10)-1; // extract the last digit and-1, 2=1, 1=0
-    bits /= 10;               // remove the last digit from the number
-    bitBuffer1<<=1;
-    bitBuffer1|=lastBit;
-    if (++bitBufferLength == 8) {  // if the buffer is full write to file
-        out.write((char)bitBuffer1);
-
-        bitBufferLength = 0;  // reset the buffer Lenght
-        bitBuffer1=-1;// reset the buffer
+            bitBufferLength = 0;  // reset the buffer Lenght
+            bitBuffer1=-1;// reset the buffer
+            }
+            
         }
-        
     }
-}
+
+    // function that takes node, "" as default indent, 0 as default level
+    // and outputs a somewhat readable tree
+    // Made with chatGPT and doesn't need to go into production
+    public static void traverse(Node node, String indent, int level) { // (node,"",0)
+        if (node instanceof Leaf) {
+            Leaf leaf = (Leaf) node;
+            System.out.println(indent + "Leaf: " + leaf.character + ", Freq: " + leaf.frequency + ", Level: " + level);
+        } else if (node instanceof Branch) {
+            Branch branch = (Branch) node;
+            System.out.println(indent + "Branch: Freq: " + branch.frequency + ", Level: " + level);
+            traverse(branch.left, indent + "    ", level + 1);
+            traverse(branch.right, indent + "    ", level + 1);
+        }
+    }
     
 
 

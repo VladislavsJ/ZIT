@@ -24,3 +24,7 @@ hs_err_pid*
 
 # keeps appearing soletimes
 tempCodeRunnerFile.java
+
+# temporary files
+tmp.java
+outputH.bin
